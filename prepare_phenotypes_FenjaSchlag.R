@@ -1,22 +1,21 @@
-# Define all input variables ( such as in the R markdown script)
-# Install packages
-# dplyr
+#-------------------Phenotype preparation script-------------------####
+# Run this script to format your phenotype  input in order to make use of the GWAS pipeline
+# Name: FenjaSchlag
+# Date: 04-04-2021
+#------------------------------------------------------------------####
+
+#-------------------Load libraries---------------------------------####
 library(dplyr)
 library(tidyr)
-# tidyr
-
-# Run everything as in the previous markdown script in order to create a data frame with column names indicating: COHORT_INSTRUMENT_TRAIT_RATER_AGE
+#-------------------Define input data------------------------------####
 phenotypeDirectory <- "C:/Users/Fenja/Documents/Work/EAGLE/" #"/path/to/phenotype/data"
 phenotypeData <- "social.pheno.phe"  #"phenotype_data_file.txt"
 separator <- "\t" #separator in phenotype file 
 na_string <- "NA" #NA string in phenotype file
 cohort =  "COHORT1" #"cohortname" # paste cohort name
 
-#Fill in the column name that indicates the Subject ID, required
-#Unique ID consisting of Pedigree Name and Individual ID: "Pedigree name"_"Individuals ID"
 #This ID should be the same identifier as it is used in the genotype files
 subject_ID<-"IID"
-
 #Fill in the column name that indicates the family ID, if not available fill in NA
 FID<-"fam_id"
 #Fill in the column name that indicates the within family personal ID, if not available fill in NA
@@ -64,7 +63,7 @@ females <-2 #"F"
 #Fill in column names of your principal components that you would like to include in your analysis
 pc<-c("pc1", "pc2")
 
-#Load Phenotype data
+#-------------------------Load  data-------------------------------####
 pheno <- read.table(paste(phenotypeDirectory,phenotypeData, sep=""), sep=separator,na.strings = na_string, header=TRUE)
 #Identify age groups
 age<-paste(round(sapply(subset(pheno,select = age_columns),mean, na.rm=T),digits = 0),"Y",sep="")
@@ -72,7 +71,7 @@ age<-paste(round(sapply(subset(pheno,select = age_columns),mean, na.rm=T),digits
 phenotype_descriptions<-paste(cohort,phenotype_instrument,phenotype_trait,phenotype_rater,age,sep="_")
 age_descriptions<-paste(phenotype_descriptions,"age",sep = ".")
 
-#Write phenotype input file for GWAS
+#-------------------Data fame ormatting----------------------------####
 FID <-data.frame(ifelse(is.na(FID),rep(NA,nrow(pheno)),subset(pheno,select = FID)))
 if (is.na(FID)==TRUE){
   FID<-rep(NA,nrow(pheno))}
@@ -93,16 +92,3 @@ new_PH<-  pheno_OUT %>%
   #caluclate mean score per group with summarze function
   #assign per individual score a z score 
   head(new_PH)
-#Warning message:
-#  Expected 5 pieces. Additional pieces discarded in 123390 rows
-  
-#group_by()
-# Calculate the z-scores
-# Calculate the phenotypic correlations
-# Get N observations of each phenotype
-# Get N overlapping observations between phenotype (from pairwise pearson correlation)
-# Get error score from correlations
-
-# Prepare input files for snptest
-
-# Make sure that the order of individuals is the same in phenotype file and vcf file. Write code for that?
